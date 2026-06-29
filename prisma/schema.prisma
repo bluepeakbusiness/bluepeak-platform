@@ -7,196 +7,123 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  fullName  String
-  email     String   @unique
-  password  String
-  role      String   @default("CLIENT")
-  createdAt DateTime @default(now())
+/////////////////////////////////////////////////////////
+// USERS
+/////////////////////////////////////////////////////////
 
-  chats Chat[]
-  tasks Task[]
+model User {
+  id           String   @id @default(cuid())
+  fullName     String
+  email        String   @unique
+  password     String
+  role         String   @default("CLIENT")
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  chats        Chat[]
+  tasks        Task[]
 }
+
+/////////////////////////////////////////////////////////
+// CLIENT MANAGEMENT
+/////////////////////////////////////////////////////////
 
 model Client {
-  id String @id @default(cuid())
 
-  // ==========================
-  // COMPANY
-  // ==========================
+  id                  String      @id @default(cuid())
 
-  companyCode String? @unique
-  companyName String
-  legalName   String?
+  companyName         String
+  contactPerson       String
 
-  // ==========================
-  // PRIMARY CONTACT
-  // ==========================
+  email               String
+  mobile              String
 
-  contactName String
-  designation String?
+  alternateMobile     String?
+  website             String?
 
-  email           String
-  mobile          String
-  alternateMobile String?
+  gstNumber           String?
+  panNumber           String?
+  tanNumber           String?
 
-  website String?
+  country             String
+  state               String
+  city                String
 
-  // ==========================
-  // TAX
-  // ==========================
+  address             String
+  postalCode          String?
 
-  gstNumber String?
-  panNumber String?
-  tanNumber String?
-  vatNumber String?
-  trnNumber String?
+  industry            String?
 
-  // ==========================
-  // BUSINESS
-  // ==========================
+  currency            String      @default("INR")
+  timezone            String      @default("Asia/Kolkata")
 
-  industry String?
+  clientType          String      @default("BUSINESS")
 
-  country String
-  state   String?
-  city    String?
+  status              String      @default("ACTIVE")
 
-  currency String @default("INR")
+  subscriptionPlan    String?
 
-  // ==========================
-  // ADDRESS
-  // ==========================
+  notes               String?
 
-  billingAddress  String?
-  shippingAddress String?
-
-  // ==========================
-  // STATUS
-  // ==========================
-
-  status String @default("ACTIVE")
-
-  source String?
-
-  remarks String?
-
-  aiSummary String?
-
-  // ==========================
-  // AUDIT
-  // ==========================
-
-  createdAt DateTime @default(now())
-
-  updatedAt DateTime @updatedAt
-
-  // ==========================
-  // RELATIONS
-  // ==========================
-
-  contacts ClientContact[]
-
-  notes ClientNote[]
-
-  documents ClientDocument[]
-
-  activities ClientActivity[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
 }
 
-model ClientContact {
-  id String @id @default(cuid())
-
-  clientId String
-
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-
-  name String
-
-  designation String?
-
-  email String?
-
-  mobile String?
-
-  createdAt DateTime @default(now())
-}
-model ClientNote {
-  id String @id @default(cuid())
-
-  clientId String
-
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-
-  note String
-
-  createdBy String?
-
-  createdAt DateTime @default(now())
-}
-model ClientDocument {
-  id String @id @default(cuid())
-
-  clientId String
-
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-
-  documentName String
-
-  documentUrl String
-
-  documentType String?
-
-  uploadedAt DateTime @default(now())
-}
-model ClientActivity {
-  id String @id @default(cuid())
-
-  clientId String
-
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-
-  activity String
-
-  createdBy String?
-
-  createdAt DateTime @default(now())
-}
+/////////////////////////////////////////////////////////
+// TASKS
+/////////////////////////////////////////////////////////
 
 model Task {
-  id          String @id @default(cuid())
-  title       String
-  description String
-  priority    String @default("NORMAL")
-  status      String @default("PENDING")
 
-  assignedToId String?
-  assignedTo   User?   @relation(fields: [assignedToId], references: [id])
+  id              String      @id @default(cuid())
 
-  createdAt   DateTime  @default(now())
-  startedAt   DateTime?
-  completedAt DateTime?
+  title           String
+  description     String
+
+  priority        String      @default("NORMAL")
+  status          String      @default("PENDING")
+
+  assignedToId    String?
+  assignedTo      User?       @relation(fields: [assignedToId], references: [id])
+
+  createdAt       DateTime    @default(now())
+  startedAt       DateTime?
+  completedAt     DateTime?
 }
+
+/////////////////////////////////////////////////////////
+// MESSAGE BUS
+/////////////////////////////////////////////////////////
 
 model Message {
-  id        String   @id @default(cuid())
-  fromAgent String
-  toAgent   String
-  subject   String
-  body      String
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
+
+  id            String      @id @default(cuid())
+
+  fromAgent     String
+  toAgent       String
+
+  subject       String
+  body          String
+
+  status        String      @default("PENDING")
+
+  createdAt     DateTime    @default(now())
 }
 
+/////////////////////////////////////////////////////////
+// AI CHAT HISTORY
+/////////////////////////////////////////////////////////
+
 model Chat {
-  id String @id @default(cuid())
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  id            String      @id @default(cuid())
 
-  question String
-  answer   String
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
 
-  createdAt DateTime @default(now())
+  question      String
+  answer        String
+
+  createdAt     DateTime    @default(now())
 }
