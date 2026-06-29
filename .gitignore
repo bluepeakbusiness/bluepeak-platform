@@ -1,5 +1,59 @@
-node_modules
-# Keep environment variables out of version control
-.env
+# ==========================================
+# BLUEPEAK AI OS
+# Node.js + Prisma
+# ==========================================
 
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Prisma
 /generated/prisma
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+
+# Build
+dist/
+build/
+
+# Cache
+.cache/
+.tmp/
+.temp/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Uploads (optional if user uploads should not be committed)
+uploads/
+
+# SQLite database (keep only if you DON'T want to commit it)
+# bluepeak.db
+# prisma/bluepeak.db
+
+# Misc
+*.swp
+*.swo
