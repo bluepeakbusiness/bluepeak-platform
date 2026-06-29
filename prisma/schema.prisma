@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String   @unique
+  password  String
+  role      String   @default("CLIENT")
+  createdAt DateTime @default(now())
+
+  chats Chat[]
+  tasks Task[]
+}
+
+model Client {
+  id String @id @default(cuid())
+
+  // ==========================
+  // COMPANY
+  // ==========================
+
+  companyCode String? @unique
+  companyName String
+  legalName   String?
+
+  // ==========================
+  // PRIMARY CONTACT
+  // ==========================
+
+  contactName String
+  designation String?
+
+  email           String
+  mobile          String
+  alternateMobile String?
+
+  website String?
+
+  // ==========================
+  // TAX
+  // ==========================
+
+  gstNumber String?
+  panNumber String?
+  tanNumber String?
+  vatNumber String?
+  trnNumber String?
+
+  // ==========================
+  // BUSINESS
+  // ==========================
+
+  industry String?
+
+  country String
+  state   String?
+  city    String?
+
+  currency String @default("INR")
+
+  // ==========================
+  // ADDRESS
+  // ==========================
+
+  billingAddress  String?
+  shippingAddress String?
+
+  // ==========================
+  // STATUS
+  // ==========================
+
+  status String @default("ACTIVE")
+
+  source String?
+
+  remarks String?
+
+  aiSummary String?
+
+  // ==========================
+  // AUDIT
+  // ==========================
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  // ==========================
+  // RELATIONS
+  // ==========================
+
+  contacts ClientContact[]
+
+  notes ClientNote[]
+
+  documents ClientDocument[]
+
+  activities ClientActivity[]
+}
+
+model ClientContact {
+  id String @id @default(cuid())
+
+  clientId String
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  name String
+
+  designation String?
+
+  email String?
+
+  mobile String?
+
+  createdAt DateTime @default(now())
+}
+model ClientNote {
+  id String @id @default(cuid())
+
+  clientId String
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  note String
+
+  createdBy String?
+
+  createdAt DateTime @default(now())
+}
+model ClientDocument {
+  id String @id @default(cuid())
+
+  clientId String
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  documentName String
+
+  documentUrl String
+
+  documentType String?
+
+  uploadedAt DateTime @default(now())
+}
+model ClientActivity {
+  id String @id @default(cuid())
+
+  clientId String
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  activity String
+
+  createdBy String?
+
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  priority    String @default("NORMAL")
+  status      String @default("PENDING")
+
+  assignedToId String?
+  assignedTo   User?   @relation(fields: [assignedToId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  fromAgent String
+  toAgent   String
+  subject   String
+  body      String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+}
+
+model Chat {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  question String
+  answer   String
+
+  createdAt DateTime @default(now())
+}
