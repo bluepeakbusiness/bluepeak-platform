@@ -139,5 +139,6 @@ app.listen(PORT, () => {
     console.log("✓ AI Chat");
     console.log("");
     console.log("✅ messageRoutes loaded");
+    console.log(`Auth          : http://localhost:${PORT}/api/auth`);
 
 });
