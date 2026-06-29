@@ -3,20 +3,52 @@ import { hashPassword, comparePassword } from "../utils/password.js";
 import { generateToken } from "../utils/jwt.js";
 
 /**
+ * Normalize Email
+ */
+function normalizeEmail(email) {
+    return email.trim().toLowerCase();
+}
+
+/**
+ * Build Safe User Object
+ */
+function buildUserResponse(user) {
+    return {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+    };
+}
+
+/**
  * Register User
  */
 export async function registerUser(data) {
-
     const { fullName, email, password } = data;
 
-    if (!fullName || !email || !password) {
-        throw new Error("All fields are required.");
+    if (!fullName?.trim()) {
+        throw new Error("Full name is required.");
     }
+
+    if (!email?.trim()) {
+        throw new Error("Email is required.");
+    }
+
+    if (!password) {
+        throw new Error("Password is required.");
+    }
+
+    if (password.length < 8) {
+        throw new Error("Password must be at least 8 characters long.");
+    }
+
+    const normalizedEmail = normalizeEmail(email);
 
     const existingUser = await prisma.user.findUnique({
         where: {
-            email
-        }
+            email: normalizedEmail,
+        },
     });
 
     if (existingUser) {
@@ -27,23 +59,16 @@ export async function registerUser(data) {
 
     const user = await prisma.user.create({
         data: {
-            fullName,
-            email,
+            fullName: fullName.trim(),
+            email: normalizedEmail,
             password: hashedPassword,
-            role: "CLIENT"
-        }
+            role: "CLIENT",
+        },
     });
 
-    const token = generateToken(user);
-
     return {
-        token,
-        user: {
-            id: user.id,
-            fullName: user.fullName,
-            email: user.email,
-            role: user.role
-        }
+        token: generateToken(user),
+        user: buildUserResponse(user),
     };
 }
 
@@ -51,61 +76,57 @@ export async function registerUser(data) {
  * Login User
  */
 export async function loginUser(data) {
-
     const { email, password } = data;
 
-    if (!email || !password) {
-        throw new Error("Email and password are required.");
+    if (!email?.trim()) {
+        throw new Error("Email is required.");
     }
+
+    if (!password) {
+        throw new Error("Password is required.");
+    }
+
+    const normalizedEmail = normalizeEmail(email);
 
     const user = await prisma.user.findUnique({
         where: {
-            email
-        }
+            email: normalizedEmail,
+        },
     });
 
     if (!user) {
         throw new Error("Invalid email or password.");
     }
 
-    const validPassword = await comparePassword(
+    const passwordMatched = await comparePassword(
         password,
         user.password
     );
 
-    if (!validPassword) {
+    if (!passwordMatched) {
         throw new Error("Invalid email or password.");
     }
 
-    const token = generateToken(user);
-
     return {
-        token,
-        user: {
-            id: user.id,
-            fullName: user.fullName,
-            email: user.email,
-            role: user.role
-        }
+        token: generateToken(user),
+        user: buildUserResponse(user),
     };
 }
 
 /**
- * Get User by ID
+ * Get User Profile
  */
 export async function getUserById(id) {
-
-    return await prisma.user.findUnique({
+    return prisma.user.findUnique({
         where: {
-            id
+            id,
         },
         select: {
             id: true,
             fullName: true,
             email: true,
             role: true,
-            createdAt: true
-        }
+            createdAt: true,
+        },
     });
-
 }

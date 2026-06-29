@@ -5,87 +5,97 @@ import {
 } from "../services/authService.js";
 
 /**
- * Register
+ * Standard API Response
+ */
+function sendResponse(res, status, success, message, data = null) {
+    return res.status(status).json({
+        success,
+        message,
+        data,
+        timestamp: new Date().toISOString()
+    });
+}
+
+/**
+ * Register User
  */
 export async function register(req, res) {
-
     try {
-
         const result = await registerUser(req.body);
 
-        res.status(201).json({
-            success: true,
-            message: "User registered successfully.",
-            ...result
-        });
+        return sendResponse(
+            res,
+            201,
+            true,
+            "User registered successfully.",
+            result
+        );
 
     } catch (error) {
-
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
-
+        return sendResponse(
+            res,
+            400,
+            false,
+            error.message
+        );
     }
-
 }
 
 /**
- * Login
+ * Login User
  */
 export async function login(req, res) {
-
     try {
-
         const result = await loginUser(req.body);
 
-        res.json({
-            success: true,
-            message: "Login successful.",
-            ...result
-        });
+        return sendResponse(
+            res,
+            200,
+            true,
+            "Login successful.",
+            result
+        );
 
     } catch (error) {
-
-        res.status(401).json({
-            success: false,
-            message: error.message
-        });
-
+        return sendResponse(
+            res,
+            401,
+            false,
+            error.message
+        );
     }
-
 }
 
 /**
- * Current User Profile
+ * Current Logged-in User
  */
 export async function profile(req, res) {
-
     try {
-
         const user = await getUserById(req.user.id);
 
         if (!user) {
-
-            return res.status(404).json({
-                success: false,
-                message: "User not found."
-            });
-
+            return sendResponse(
+                res,
+                404,
+                false,
+                "User not found."
+            );
         }
 
-        res.json({
-            success: true,
+        return sendResponse(
+            res,
+            200,
+            true,
+            "Profile fetched successfully.",
             user
-        });
+        );
 
     } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-
+        return sendResponse(
+            res,
+            500,
+            false,
+            error.message
+        );
     }
-
 }

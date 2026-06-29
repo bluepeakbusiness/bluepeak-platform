@@ -1,13 +1,26 @@
 import express from "express";
 
-import { getOrganization } from "./organizationEngine.js";
+import {
+    organization,
+    company,
+    departments,
+    roles,
+    hierarchy,
+    permissions,
+} from "./organizationController.js";
 
 const router = express.Router();
 
-router.get("/",(req,res)=>{
+router.get("/", organization);
 
-    res.json(getOrganization());
+router.get("/company", company);
 
-});
+router.get("/departments", departments);
+
+router.get("/roles", roles);
+
+router.get("/hierarchy", hierarchy);
+
+router.get("/permissions", permissions);
 
 export default router;

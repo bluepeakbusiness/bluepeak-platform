@@ -7,123 +7,73 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/////////////////////////////////////////////////////////
-// USERS
-/////////////////////////////////////////////////////////
-
 model User {
-  id           String   @id @default(cuid())
-  fullName     String
-  email        String   @unique
-  password     String
-  role         String   @default("CLIENT")
-
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  chats        Chat[]
-  tasks        Task[]
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String   @unique
+  password  String
+  role      String   @default("CLIENT")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  chats     Chat[]
+  tasks     Task[]
 }
-
-/////////////////////////////////////////////////////////
-// CLIENT MANAGEMENT
-/////////////////////////////////////////////////////////
 
 model Client {
-
-  id                  String      @id @default(cuid())
-
-  companyName         String
-  contactPerson       String
-
-  email               String
-  mobile              String
-
-  alternateMobile     String?
-  website             String?
-
-  gstNumber           String?
-  panNumber           String?
-  tanNumber           String?
-
-  country             String
-  state               String
-  city                String
-
-  address             String
-  postalCode          String?
-
-  industry            String?
-
-  currency            String      @default("INR")
-  timezone            String      @default("Asia/Kolkata")
-
-  clientType          String      @default("BUSINESS")
-
-  status              String      @default("ACTIVE")
-
-  subscriptionPlan    String?
-
-  notes               String?
-
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+  id               String   @id @default(cuid())
+  companyName      String
+  contactPerson    String
+  email            String
+  mobile           String
+  alternateMobile  String?
+  website          String?
+  gstNumber        String?
+  panNumber        String?
+  tanNumber        String?
+  country          String
+  state            String
+  city             String
+  address          String
+  postalCode       String?
+  industry         String?
+  currency         String   @default("INR")
+  timezone         String   @default("Asia/Kolkata")
+  clientType       String   @default("BUSINESS")
+  status           String   @default("ACTIVE")
+  subscriptionPlan String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
-
-/////////////////////////////////////////////////////////
-// TASKS
-/////////////////////////////////////////////////////////
 
 model Task {
-
-  id              String      @id @default(cuid())
-
-  title           String
-  description     String
-
-  priority        String      @default("NORMAL")
-  status          String      @default("PENDING")
-
-  assignedToId    String?
-  assignedTo      User?       @relation(fields: [assignedToId], references: [id])
-
-  createdAt       DateTime    @default(now())
-  startedAt       DateTime?
-  completedAt     DateTime?
+  id           String    @id @default(cuid())
+  title        String
+  description  String
+  priority     String    @default("NORMAL")
+  status       String    @default("PENDING")
+  assignedToId String?
+  createdAt    DateTime  @default(now())
+  startedAt    DateTime?
+  completedAt  DateTime?
+  assignedTo   User?     @relation(fields: [assignedToId], references: [id])
 }
-
-/////////////////////////////////////////////////////////
-// MESSAGE BUS
-/////////////////////////////////////////////////////////
 
 model Message {
-
-  id            String      @id @default(cuid())
-
-  fromAgent     String
-  toAgent       String
-
-  subject       String
-  body          String
-
-  status        String      @default("PENDING")
-
-  createdAt     DateTime    @default(now())
+  id        String   @id @default(cuid())
+  fromAgent String
+  toAgent   String
+  subject   String
+  body      String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
 }
 
-/////////////////////////////////////////////////////////
-// AI CHAT HISTORY
-/////////////////////////////////////////////////////////
-
 model Chat {
-
-  id            String      @id @default(cuid())
-
-  userId        String
-  user          User        @relation(fields: [userId], references: [id])
-
-  question      String
-  answer        String
-
-  createdAt     DateTime    @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  question  String
+  answer    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
