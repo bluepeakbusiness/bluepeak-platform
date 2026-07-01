@@ -8,6 +8,7 @@ import {
   FiFileText,
   FiBarChart2,
   FiHome,
+  FiTarget,
 } from 'react-icons/fi';
 
 import { NavLink } from 'react-router-dom';
@@ -34,7 +35,7 @@ const menu = [
     path: "/hr",
   },
   {
-    icon: FiMegaphone,
+    icon: FiTarget,
     title: "Marketing",
     path: "/marketing",
   },

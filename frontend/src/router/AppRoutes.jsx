@@ -8,6 +8,10 @@ import ForgotPassword from '../pages/ForgotPassword';
 import Dashboard from '../pages/Dashboard';
 import Profile from '../pages/Profile';
 import Settings from '../pages/Settings';
+import Chat from '../pages/Dashboard';
+import Organization from '../pages/organization/index';
+import Messages from '../pages/organization/page';
+import Registry from '../pages/organization/page';
 import NotFound from '../pages/NotFound';
 import ProtectedRoute from './ProtectedRoute';
 import GuestRoute from './GuestRoute';
@@ -30,6 +34,10 @@ export default function AppRoutes() {
             <Route path="/dashboard" element={<Navigate to="/" replace />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/organization" element={<Organization />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/registry" element={<Registry />} />
           </Route>
         </Route>
 

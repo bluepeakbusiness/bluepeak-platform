@@ -1,0 +1,4 @@
+/**
+ * Application Config
+ */
+export default {};
