@@ -1,0 +1,8 @@
+export default function Radio({ label, ...props }) {
+  return (
+    <label className="flex items-center gap-2 text-sm text-slate-700">
+      <input type="radio" {...props} />
+      {label}
+    </label>
+  );
+}
