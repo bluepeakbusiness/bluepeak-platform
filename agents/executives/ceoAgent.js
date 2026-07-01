@@ -1,10 +1,9 @@
+import "dotenv/config";
+
 import { GoogleGenAI } from "@google/genai";
-import dotenv from "dotenv";
 
 import { companyMemory } from "../../memory/companyMemory.js";
 import { registerAgent } from "../../core/registry/agentRegistry.js";
-
-dotenv.config();
 
 // Register AI CEO once when this module loads
 registerAgent({

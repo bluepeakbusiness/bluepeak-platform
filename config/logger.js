@@ -1,0 +1,4 @@
+/**
+ * Logger Config
+ */
+export default {};

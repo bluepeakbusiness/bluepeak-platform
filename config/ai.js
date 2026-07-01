@@ -1,0 +1,4 @@
+/**
+ * AI Configuration
+ */
+export default {};

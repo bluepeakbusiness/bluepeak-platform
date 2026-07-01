@@ -1,13 +1,18 @@
-import { CEOAgent } from "../agents/ceoAgent.js";
+import { runCEO } from "../agents/executives/ceoAgent.js";
 
-export async function askCEO(req, res){
+export async function askCEO(req, res) {
+    try {
+        const report = req.body.report;
+        const answer = await runCEO(report);
 
-    const report = req.body.report;
-
-    const answer = await CEOAgent(report);
-
-    res.json({
-        answer
-    });
-
+        res.json({
+            success: true,
+            answer
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
 }

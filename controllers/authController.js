@@ -1,3 +1,4 @@
+import { loginSchema, registerSchema } from "../modules/auth/validator.js";
 import {
     registerUser,
     loginUser,
@@ -16,12 +17,17 @@ function sendResponse(res, status, success, message, data = null) {
     });
 }
 
+function getErrorMessage(error) {
+    return error.issues?.[0]?.message || error.message;
+}
+
 /**
  * Register User
  */
 export async function register(req, res) {
     try {
-        const result = await registerUser(req.body);
+        const payload = registerSchema.parse(req.body);
+        const result = await registerUser(payload);
 
         return sendResponse(
             res,
@@ -36,7 +42,7 @@ export async function register(req, res) {
             res,
             400,
             false,
-            error.message
+            getErrorMessage(error)
         );
     }
 }
@@ -46,7 +52,8 @@ export async function register(req, res) {
  */
 export async function login(req, res) {
     try {
-        const result = await loginUser(req.body);
+        const payload = loginSchema.parse(req.body);
+        const result = await loginUser(payload);
 
         return sendResponse(
             res,
@@ -61,7 +68,7 @@ export async function login(req, res) {
             res,
             401,
             false,
-            error.message
+            getErrorMessage(error)
         );
     }
 }

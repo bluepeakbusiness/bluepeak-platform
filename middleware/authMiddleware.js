@@ -1,3 +1,5 @@
+import prisma from "../config/prisma.js";
+import { AuthenticationError, AuthorizationError } from "../utils/errors.js";
 import { verifyToken } from "../utils/jwt.js";
 
 export async function authenticate(req, res, next) {
@@ -5,64 +7,81 @@ export async function authenticate(req, res, next) {
         const authHeader = req.headers.authorization;
 
         if (!authHeader) {
-            return res.status(401).json({
-                success: false,
-                message: "Authorization header missing."
-            });
+            return next(new AuthenticationError(
+                "Authorization header missing.",
+                "AUTHORIZATION_HEADER_MISSING"
+            ));
         }
 
-        if (!authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid authorization format."
-            });
+        const match = authHeader.match(/^Bearer\s+(\S+)$/i);
+
+        if (!match) {
+            return next(new AuthenticationError(
+                "Invalid authorization format.",
+                "INVALID_AUTHORIZATION_FORMAT"
+            ));
         }
 
-        const token = authHeader.split(" ")[1];
+        const decoded = verifyToken(match[1]);
 
-        const user = verifyToken(token);
+        if (!decoded?.id) {
+            return next(new AuthenticationError(
+                "Invalid or expired token.",
+                "INVALID_TOKEN"
+            ));
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: decoded.id },
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+                role: true,
+                status: true,
+                deletedAt: true,
+            },
+        });
 
         if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid or expired token."
-            });
+            return next(new AuthenticationError(
+                "User associated with this token no longer exists.",
+                "USER_NOT_FOUND"
+            ));
+        }
+
+        if (user.status !== "ACTIVE" || user.deletedAt) {
+            return next(new AuthenticationError(
+                "User account is not active.",
+                "USER_INACTIVE"
+            ));
         }
 
         req.user = user;
 
-        next();
+        return next();
     } catch (error) {
-        return res.status(401).json({
-            success: false,
-            message: "Authentication failed."
-        });
+        if (["JsonWebTokenError", "TokenExpiredError", "NotBeforeError"].includes(error.name)) {
+            return next(new AuthenticationError(
+                "Invalid or expired token.",
+                "INVALID_TOKEN"
+            ));
+        }
+
+        return next(error);
     }
 }
 
-/**
- * Role Authorization
- *
- * Example:
- * authorize("ADMIN")
- * authorize("CEO", "ADMIN")
- */
 export function authorize(...roles) {
     return (req, res, next) => {
         if (!req.user) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized."
-            });
+            return next(new AuthenticationError());
         }
 
         if (!roles.includes(req.user.role)) {
-            return res.status(403).json({
-                success: false,
-                message: "Access denied."
-            });
+            return next(new AuthorizationError());
         }
 
-        next();
+        return next();
     };
 }
